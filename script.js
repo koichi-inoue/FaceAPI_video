@@ -66,13 +66,15 @@ function drawBox(result){
 
         ctx.beginPath();
         ctx.rect(x, y, boxWidth, boxHeight);
-        ctx.strokeStyle = "#a15ffb";
+        ctx.strokeStyle = "#ffffff";
         ctx.stroke();
         ctx.closePath();
     }
 }
 
 function drawLandmarks(result){
+
+    ctx.strokeStyle = "#a15ffb";
 
     for(let i = 0; i < result.length; i++){
         const mouth = result[i].parts.mouth;
