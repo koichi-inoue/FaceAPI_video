@@ -29,88 +29,81 @@ window.onload = function() {
  }
 
 function modelLoaded() {
-    document.getElementById('message').innerHTML = '<p>FaceApi loaded! | Now Preparing! </p>';
-    faceapi.detect(gotResults);
+  document.getElementById('message').innerHTML = '<p>FaceApi loaded! | Now Preparing! </p>';
+  faceapi.detect(gotResults);
 }
 
 function gotResults(err, result) {
 
-    document.getElementById('message').innerHTML = '<p>FaceApi Running!</p>';
+  document.getElementById('message').innerHTML = '<p>FaceApi Running!</p>';
 
-    if (err) {
-      console.log(err)
-      return
+  if (err) {
+    console.log(err)
+    return
+  }
+
+  if (result) {
+    ctx.fillStyle = "#000000"
+    ctx.fillRect(0,0, width, height);
+    ctx.drawImage(video, 0,0, width, height);
+    if(result.length > 0){
+      drawBox(result)
+      drawLandmarks(result)
     }
+  }
 
-    if (result) {
-      ctx.fillStyle = "#000000"
-      ctx.fillRect(0,0, width, height);
-      ctx.drawImage(video, 0,0, width, height);
-      if(result.length > 0){
-        drawBox(result)
-        drawLandmarks(result)
-      }
-    }
-
-    faceapi.detect(gotResults);
+  faceapi.detect(gotResults);
 }
 
 function drawBox(result){
 
-    for(let i = 0; i < result.length; i++){
-        const alignedRect = result[i].alignedRect;
-        const x = alignedRect._box._x
-        const y = alignedRect._box._y
-        const boxWidth = alignedRect._box._width
-        const boxHeight  = alignedRect._box._height
+  for(let i = 0; i < result.length; i++){
+    const alignedRect = result[i].alignedRect;
+    const x = alignedRect._box._x
+    const y = alignedRect._box._y
+    const boxWidth = alignedRect._box._width
+    const boxHeight  = alignedRect._box._height
 
-        ctx.beginPath();
-        ctx.rect(x, y, boxWidth, boxHeight);
-        ctx.strokeStyle = "#ffffff";
-        ctx.stroke();
-        ctx.closePath();
-    }
+    ctx.beginPath();
+    ctx.rect(x, y, boxWidth, boxHeight);
+    ctx.strokeStyle = "#ffffff";
+    ctx.stroke();
+    ctx.closePath();
+  }
 }
 
 function drawLandmarks(result){
 
-    ctx.strokeStyle = "#a15ffb";
+  ctx.strokeStyle = "#a15ffb";
 
-    for(let i = 0; i < result.length; i++){
-        const mouth = result[i].parts.mouth;
-        const nose = result[i].parts.nose;
-        const leftEye = result[i].parts.leftEye;
-        const rightEye = result[i].parts.rightEye;
-        const rightEyeBrow = result[i].parts.rightEyeBrow;
-        const leftEyeBrow = result[i].parts.leftEyeBrow;
-
-        drawPart(mouth, true);
-        drawPart(nose, false);
-        drawPart(leftEye, true);
-        drawPart(leftEyeBrow, false);
-        drawPart(rightEye, true);
-        drawPart(rightEyeBrow, false);
-    }
+  for(let i = 0; i < result.length; i++){
+    drawPart(result[i].parts.mouth, true);
+    drawPart(result[i].parts.nose, false);
+    drawPart(result[i].parts.leftEye, true);
+    drawPart(result[i].parts.leftEyeBrow, false);
+    drawPart(result[i].parts.rightEye, true);
+    drawPart(result[i].parts.rightEyeBrow, false);
+  }
 
 }
 
 function drawPart(feature, closed){
 
-    ctx.beginPath();
-    for(let i = 0; i < feature.length; i++){
-        const x = feature[i]._x;
-        const y = feature[i]._y;
+  ctx.beginPath();
+  for(let i = 0; i < feature.length; i++){
+    const x = feature[i]._x;
+    const y = feature[i]._y;
 
-        if(i === 0){
-            ctx.moveTo(x, y);
-        } else {
-            ctx.lineTo(x, y);
-        }
+    if(i === 0){
+        ctx.moveTo(x, y);
+    } else {
+        ctx.lineTo(x, y);
     }
+  }
 
-    if(closed === true){
-        ctx.closePath();
-    }
-    ctx.stroke();
+  if(closed === true){
+      ctx.closePath();
+  }
+  ctx.stroke();
 
 }
