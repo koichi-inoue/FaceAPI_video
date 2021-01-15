@@ -1,3 +1,4 @@
+let faceapi;
 let video;
 let width = 480;
 let height = 360;
@@ -17,20 +18,15 @@ window.onload = function() {
       video.play();
     })
 
-  init();
+  canvas = document.createElement("canvas");
+  canvas.width  = width;
+  canvas.height = height;
+  document.body.appendChild(canvas);
+  ctx = canvas.getContext('2d');
+
+  faceapi = ml5.faceApi(video, modelLoaded);
 
  }
-
-function init(){
-
-    canvas = document.createElement("canvas");
-    canvas.width  = width;
-    canvas.height = height;
-    document.body.appendChild(canvas);
-    ctx = canvas.getContext('2d');
-
-    faceapi = ml5.faceApi(video, modelLoaded);
-}
 
 function modelLoaded() {
     document.getElementById('message').innerHTML = '<p>FaceApi model loaded!</p>';
