@@ -1,28 +1,27 @@
-let faceapi;
 let video;
-let detections;
 let width = 480;
 let height = 360;
 let canvas, ctx;
 
-const detection_options = {
-    withLandmarks: true,
-    withDescriptors: false,
-}
+window.onload = function() {
 
-window.onload = function() { make(); }
+  video = document.createElement('video');
+  video.setAttribute("style", "display: none;");
+  video.width = width;
+  video.height = height;
+  document.body.appendChild(video);
 
-async function make(){
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then((stream) => {
+      video.srcObject = stream;
+      video.play();
+    })
 
-    video = document.createElement('video');
-    video.setAttribute("style", "display: none;");
-    video.width = width;
-    video.height = height;
-    document.body.appendChild(video);
+  init();
 
-    const capture = await navigator.mediaDevices.getUserMedia({ video: true })
-    video.srcObject = capture;
-    video.play();
+ }
+
+function init(){
 
     canvas = document.createElement("canvas");
     canvas.width  = width;
@@ -30,43 +29,38 @@ async function make(){
     document.body.appendChild(canvas);
     ctx = canvas.getContext('2d');
 
-    faceapi = await ml5.faceApi(video, detection_options, modelReady)
-
+    faceapi = ml5.faceApi(video, modelLoaded);
 }
 
-function modelReady() {
-    console.log('ready!')
-    faceapi.detect(gotResults)
+function modelLoaded() {
+    document.getElementById('message').innerHTML = '<p>FaceApi model loaded!</p>';
+    faceapi.detect(gotResults);
 }
 
 function gotResults(err, result) {
+
     if (err) {
-        console.log(err)
-        return
+      console.log(err)
+      return
     }
 
-    // console.log(result)
-    detections = result;
-
-    // Clear part of the canvas
-    ctx.fillStyle = "#000000"
-    ctx.fillRect(0,0, width, height);
-
-    ctx.drawImage(video, 0,0, width, height);
-
-    if (detections) {
-        if(detections.length > 0){
-            drawBox(detections)
-            drawLandmarks(detections)
-        }
+    if (result) {
+      ctx.fillStyle = "#000000"
+      ctx.fillRect(0,0, width, height);
+      ctx.drawImage(video, 0,0, width, height);
+      if(result.length > 0){
+        drawBox(result)
+        drawLandmarks(result)
+      }
     }
-    faceapi.detect(gotResults)
+
+    faceapi.detect(gotResults);
 }
 
-function drawBox(detections){
+function drawBox(result){
 
-    for(let i = 0; i < detections.length; i++){
-        const alignedRect = detections[i].alignedRect;
+    for(let i = 0; i < result.length; i++){
+        const alignedRect = result[i].alignedRect;
         const x = alignedRect._box._x
         const y = alignedRect._box._y
         const boxWidth = alignedRect._box._width
@@ -80,15 +74,15 @@ function drawBox(detections){
     }
 }
 
-function drawLandmarks(detections){
+function drawLandmarks(result){
 
-    for(let i = 0; i < detections.length; i++){
-        const mouth = detections[i].parts.mouth;
-        const nose = detections[i].parts.nose;
-        const leftEye = detections[i].parts.leftEye;
-        const rightEye = detections[i].parts.rightEye;
-        const rightEyeBrow = detections[i].parts.rightEyeBrow;
-        const leftEyeBrow = detections[i].parts.leftEyeBrow;
+    for(let i = 0; i < result.length; i++){
+        const mouth = result[i].parts.mouth;
+        const nose = result[i].parts.nose;
+        const leftEye = result[i].parts.leftEye;
+        const rightEye = result[i].parts.rightEye;
+        const rightEyeBrow = result[i].parts.rightEyeBrow;
+        const leftEyeBrow = result[i].parts.leftEyeBrow;
 
         drawPart(mouth, true);
         drawPart(nose, false);
