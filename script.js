@@ -29,11 +29,13 @@ window.onload = function() {
  }
 
 function modelLoaded() {
-    document.getElementById('message').innerHTML = '<p>FaceApi model loaded!</p>';
+    document.getElementById('message').innerHTML = '<p>FaceApi loaded! | Now Preparing! </p>';
     faceapi.detect(gotResults);
 }
 
 function gotResults(err, result) {
+
+    document.getElementById('message').innerHTML = '<p>FaceApi Running!</p>';
 
     if (err) {
       console.log(err)
